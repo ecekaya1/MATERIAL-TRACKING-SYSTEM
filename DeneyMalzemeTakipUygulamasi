@@ -1,0 +1,162 @@
+import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import java.util.ArrayList;
+import java.util.Date;
+
+public class DeneyMalzemeTakipUygulamasi extends Application {
+
+    public ArrayList<Malzeme> malzemeListesi = new ArrayList<>();
+    private ObservableList<Malzeme> oMalzemeListesi = FXCollections.observableArrayList(malzemeListesi);
+    private Label toplamMiktar = new Label("Toplam Malzeme Miktarı: 0");
+    private MenuButton malzemeTur = new MenuButton("Malzeme Türü");
+    private CheckMenuItem camMalzeme= new CheckMenuItem("Cam Malzeme");
+    private CheckMenuItem plastikMalzeme = new CheckMenuItem("Plastik Malzeme");
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage stage) {
+
+
+        TableView<Malzeme> malzemeTable = new TableView<>();
+        malzemeTable.setItems(oMalzemeListesi);
+
+        TableColumn<Malzeme, String> adKısım = new TableColumn<>("Malzeme Adı");
+        adKısım.setCellValueFactory(new PropertyValueFactory<>("adi"));
+
+        TableColumn<Malzeme, Integer> miktarKısım = new TableColumn<>("Miktar");
+        miktarKısım.setCellValueFactory(new PropertyValueFactory<>("miktar"));
+
+        TableColumn<Malzeme, String> turKısım = new TableColumn<>("Türü");
+        turKısım.setCellValueFactory(new PropertyValueFactory<>("tur"));
+
+        TableColumn<Malzeme, Date> tarihKısım = new TableColumn<>("Tarih");
+        tarihKısım.setCellValueFactory(new PropertyValueFactory<>("tarih"));
+
+
+        malzemeTable.getColumns().addAll(adKısım, miktarKısım, turKısım, tarihKısım);
+
+
+        TextField adiniGir = new TextField();
+        adiniGir.setPromptText("Malzeme Adı");
+
+        TextField miktariGir = new TextField();
+        miktariGir.setPromptText("Miktar");
+
+
+        camMalzeme.setOnAction(event -> {
+            malzemeTur.setText("Cam Malzeme");
+            plastikMalzeme.setSelected(false);
+        });
+
+        plastikMalzeme.setOnAction(event -> {
+            malzemeTur.setText("Plastik Malzeme");
+            camMalzeme.setSelected(false);
+        });
+
+        malzemeTur.getItems().addAll(camMalzeme, plastikMalzeme);
+
+        DosyayaYaz malzemeDosyaIslemleri = new DosyayaYaz();
+
+
+        Button ekleButton = new Button("Ekle");
+        ekleButton.setOnAction(event -> {
+            try {
+                String adi = adiniGir.getText();
+                int miktar = Integer.parseInt(miktariGir.getText());
+
+
+                if (adi.isEmpty() || miktar < 0 ) {
+                    throw new IllegalArgumentException("Geçersiz veri girişi.");
+                }
+
+                Malzeme varolanMalzeme = malzemeListesi.stream()
+                        .filter(m -> m.getAdi().equals(adi))
+                        .findFirst()
+                        .orElse(null);
+
+                if (varolanMalzeme != null) {
+                    varolanMalzeme.setMiktar(varolanMalzeme.getMiktar() + miktar);
+                } else {
+                    Malzeme yeniMalzeme;
+                    if (camMalzeme.isSelected()) {
+                        yeniMalzeme = new CamMalzeme(adi, miktar);
+                        ArrayList<Malzeme> camlar=new ArrayList<>();
+                        camlar.add(yeniMalzeme);
+                        malzemeDosyaIslemleri.malzemeleriDosyayaYaz(camlar);
+                    } else if (plastikMalzeme.isSelected()) {
+                        yeniMalzeme = new PlastikMalzeme(miktar, adi);
+                        ArrayList<Malzeme> plastikler=new ArrayList<>();
+                        plastikler.add((yeniMalzeme));
+                        malzemeDosyaIslemleri.malzemeleriDosyayaYaz(plastikler);
+                    } else {
+                        throw new IllegalArgumentException("Malzeme türü seçilmedi.");
+                    }
+
+
+                    yeniMalzeme.setTarih(new Date());
+                    malzemeListesi.add(yeniMalzeme);
+                }
+
+                oMalzemeListesi.setAll(malzemeListesi);
+
+                adiniGir.clear();
+                miktariGir.clear();
+
+                MalzemeDegisimi.MiktariGuncelle(malzemeListesi,toplamMiktar);
+            } catch (NumberFormatException e) {
+                UyariGosterici.uyarıGoster("Hata", "Miktarı sayısal bir değer olarak giriniz.");
+            } catch (IllegalArgumentException e) {
+                UyariGosterici.uyarıGoster("Hata", e.getMessage());
+            }
+        });
+
+        Button silButton = new Button("Sil");
+        silButton.setOnAction(event -> {
+            Malzeme seciliMalzeme = malzemeTable.getSelectionModel().getSelectedItem();
+            malzemeListesi.remove(seciliMalzeme);
+            oMalzemeListesi.setAll(malzemeListesi);
+
+            MalzemeDegisimi.MiktariGuncelle(malzemeListesi, toplamMiktar);
+        });
+
+
+        UyariGosterici.setMalzemeListesi(malzemeListesi);
+
+        Button tumMalzemeleriGosterButton = new Button("Tüm Malzemeleri Göster");
+        tumMalzemeleriGosterButton.setOnAction(event -> {
+            UyariGosterici.tumMalzemeleriGoster();
+        });
+
+
+
+        HBox ekleSilBox = new HBox(10, ekleButton, silButton,tumMalzemeleriGosterButton);
+        ekleSilBox.setPadding(new Insets(23));
+
+        VBox vBox = new VBox(10,adiniGir, miktariGir, malzemeTur, ekleSilBox, malzemeTable, toplamMiktar);
+        vBox.setPadding(new Insets(10));
+
+        Scene scene = new Scene(vBox, 320, 500);
+        stage.setScene(scene);
+
+        stage.setOnCloseRequest(event -> {
+
+            malzemeDosyaIslemleri.malzemeleriDosyayaYaz(malzemeListesi, "malzemeler.txt");
+
+
+        });
+
+        stage.show();
+    }
+
+}

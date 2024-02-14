@@ -1,0 +1,41 @@
+package com.example.demo9;
+import java.util.Date;
+
+public class CamMalzeme implements Malzeme {
+    private String adi;
+    private int miktar;
+    private Date tarih;
+
+    public CamMalzeme(String adi, int miktar) {
+        this.adi = adi;
+        this.miktar = miktar;
+        this.tarih = new Date();
+    }
+    @Override
+    public String getAdi() {
+        return adi;
+    }
+
+    @Override
+    public int getMiktar() {
+        return miktar;
+    }
+
+    @Override
+    public String getTur() {
+        return "Cam";
+    }
+    @Override
+    public void setMiktar(int miktar){
+        this.miktar=miktar;
+    }
+
+    @Override
+    public Date getTarih() {
+        return tarih;
+    }
+    @Override
+    public void setTarih(Date tarih) {
+        this.tarih = tarih;
+    }
+}

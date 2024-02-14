@@ -1,0 +1,47 @@
+package com.example.demo9;
+
+
+import java.util.Date;
+
+public class PlastikMalzeme implements Malzeme {
+    private String adi;
+    private int miktar;
+    private Date tarih;
+    public PlastikMalzeme(int miktari, String adi){
+
+        this.adi = adi;
+        this.miktar = miktari;
+        this.tarih = new Date();
+    }
+    @Override
+    public String getAdi() {
+        return adi;
+    }
+
+    @Override
+    public int getMiktar() {
+        return miktar;
+    }
+
+    @Override
+    public String getTur() {
+        return "Plastik";
+    }
+    @Override
+    public void setMiktar(int miktar){
+        this.miktar=miktar;
+    }
+
+    @Override
+    public Date getTarih() {
+        return tarih;
+    }
+
+    @Override
+    public void setTarih(Date tarih) {
+        this.tarih = tarih;
+    }
+
+
+
+}

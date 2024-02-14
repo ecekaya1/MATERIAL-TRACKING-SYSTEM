@@ -1,0 +1,36 @@
+package com.example.demo9;
+
+import javafx.scene.control.Alert;
+import java.util.ArrayList;
+
+public class UyariGosterici {
+
+    public static void uyarıGoster(String baslik, String yazi) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(baslik);
+        alert.setHeaderText(null);
+        alert.setContentText(yazi);
+        alert.showAndWait();
+    }
+
+    private static ArrayList<Malzeme> malzemeListesi;
+
+    public static void setMalzemeListesi(ArrayList<Malzeme> malzemeListesi) {
+        UyariGosterici.malzemeListesi = malzemeListesi;
+    }
+    public static void tumMalzemeleriGoster() {
+        if (malzemeListesi == null) {
+            uyarıGoster("Hata", "HATALİ.");
+            return;
+        }
+
+        StringBuilder malzemelerText = new StringBuilder("Tüm Malzemeler:\n");
+        for (Malzeme malzeme : malzemeListesi) {
+            malzemelerText.append(malzeme.getAdi()).append(" //").append(malzeme.getMiktar()).append(" //  ").append(malzeme.getTur()).append("\n");
+        }
+
+        uyarıGoster("Tüm Malzemeler", malzemelerText.toString());
+    }
+
+}
+

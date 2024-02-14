@@ -1,0 +1,21 @@
+package com.example.demo9;
+import javafx.scene.control.Label;
+
+import java.util.ArrayList;
+
+public class MalzemeDegisimi {
+    public static void MiktariGuncelle(ArrayList<Malzeme> malzemeListesi, Label toplamMiktarLabel) {
+        int toplam = getToplamMiktar(malzemeListesi);
+        toplamMiktarLabel.setText("Toplam Malzeme Miktarı: " + toplam);
+    }
+
+    public static int getToplamMiktar(ArrayList<Malzeme> malzemeListesi) {
+        int toplamMiktar = 0;
+
+        for (Malzeme malzeme : malzemeListesi) {
+            toplamMiktar += malzeme.getMiktar();
+        }
+
+        return toplamMiktar;
+    }
+}

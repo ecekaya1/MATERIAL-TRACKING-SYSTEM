@@ -1,0 +1,15 @@
+package com.example.demo9;
+
+import java.time.LocalDate;
+import java.util.Date;
+
+public interface Malzeme {
+    String getAdi();
+    int getMiktar();
+    String getTur();
+    void setMiktar(int miktar);
+    Date getTarih();
+    void setTarih(Date tarih);
+
+}
+

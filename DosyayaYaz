@@ -1,0 +1,50 @@
+package com.example.demo9;
+
+import java.io.*;
+import java.util.ArrayList;
+
+
+public class DosyayaYaz {
+
+    public  void malzemeleriDosyayaYaz(ArrayList<Malzeme> malzemeListesi, String dosyaAdi) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(dosyaAdi))) {
+            writer.write("MALZEMELERİMİZ\n");
+            for (Malzeme malzeme : malzemeListesi) {
+                writer.write("Adı: " +malzeme.getAdi() + "  " +"Miktarı: " +malzeme.getMiktar() + "  " + malzeme.getTur());
+
+                writer.newLine();
+            }
+            UyariGosterici.uyarıGoster("BAŞARILI", "Malzemeler dosyaya yazıldı: " + dosyaAdi);
+        } catch (IOException e) {
+            UyariGosterici.uyarıGoster("HATA", "Dosyaya yazılamadı.");
+            e.printStackTrace();
+        }
+    }
+
+
+    public void malzemeleriDosyayaYaz(ArrayList<Malzeme> malzemeListesi) {
+        try (BufferedWriter camWriter = new BufferedWriter(new FileWriter("cam.txt", true));
+             BufferedWriter plastikWriter = new BufferedWriter(new FileWriter("plastik.txt", true))) {
+
+            for (Malzeme malzeme : malzemeListesi) {
+                if (malzeme instanceof CamMalzeme) {
+                    camWriter.write("Adı: "+malzeme.getAdi() + " Miktarı:  " + malzeme.getMiktar() );
+                    camWriter.newLine();
+                } else if (malzeme instanceof PlastikMalzeme) {
+                    plastikWriter.write("Adı: "+malzeme.getAdi() + "  Miktarı: " + malzeme.getMiktar());
+                    plastikWriter.newLine();
+                }
+            }
+
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+
+
+}
+
+
